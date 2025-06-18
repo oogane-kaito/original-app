@@ -55,7 +55,7 @@ export default function LpMain() {
                 className="w-full sm:w-auto border-orange-200 text-orange-600 hover:bg-orange-50 rounded-full px-6 sm:px-8 py-3 text-base sm:text-lg border-2"
                 >
                 <Leaf className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                サンプルを見る
+                   試す
                 </Button>
             </Link>
             
