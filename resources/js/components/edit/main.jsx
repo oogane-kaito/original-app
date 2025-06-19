@@ -13,6 +13,7 @@ import { Link } from '@inertiajs/react';
 import { DigitalCard } from "../edit/digital-card";
 
 export default function EditorPage() {
+    axios.defaults.withCredentials = true;
   const [cardData, setCardData] = useState({
     name: "",
     title: "",
