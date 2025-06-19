@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios"; // axiosをインポート
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
@@ -7,8 +8,8 @@ import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Badge } from "../ui/badge";
-import { Plus, Trash2, Eye, Save, Palette, User, LinkIcon, ArrowLeft, Sun } from "lucide-react";
-import { Link, router } from '@inertiajs/react';
+import { Plus, Trash2, Eye, Palette, User, LinkIcon, ArrowLeft, Sun } from "lucide-react";
+import { Link } from '@inertiajs/react';
 import { DigitalCard } from "../edit/digital-card";
 
 export default function EditorPage() {
@@ -38,14 +39,13 @@ export default function EditorPage() {
 
   useEffect(() => {
     // APIから名刺データを取得
-    router.get("/api/business-cards", {
-      onSuccess: (response) => {
-        setCardData(response.businessCard); // APIからの名刺データを設定
-      },
-      onError: (errors) => {
-        console.error("エラー:", errors);
-      },
-    });
+    axios.get("/api/business-cards")
+      .then(response => {
+        setCardData(response.data.businessCard); // APIからの名刺データを設定
+      })
+      .catch(error => {
+        console.error("エラー:", error);
+      });
   }, []);
 
   const updateLink = (id, field, value) => {
@@ -63,19 +63,18 @@ export default function EditorPage() {
         title: link.title,
         url: link.url,
         icon: link.icon,
-        delete: link.delete || false, // 削除フラグを含める
+        delete: link.delete || false,
       })),
     };
 
     // 名刺データを更新するAPIリクエスト
-    router.put(`/api/business-cards/${cardData.id}`, cardDataToSend, {
-      onSuccess: () => {
+    axios.put(`/api/business-cards/${cardData.id}`, cardDataToSend)
+      .then(() => {
         console.log("名刺が更新されました");
-      },
-      onError: (errors) => {
-        console.error("エラー:", errors);
-      },
-    });
+      })
+      .catch(error => {
+        console.error("エラー:", error);
+      });
   };
 
   const addLink = () => {
@@ -100,7 +99,7 @@ export default function EditorPage() {
     }));
   };
 
-   const updateTheme = (themeId) => {
+  const updateTheme = (themeId) => {
     const theme = themes.find((t) => t.id === themeId);
     if (theme) {
       setCardData((prev) => ({
@@ -285,7 +284,6 @@ export default function EditorPage() {
                           <Button
                             onClick={() => {
                               removeLink(link.id);
-                              deleteLink(link.id); // 削除APIを呼び出す
                             }}
                             size="sm"
                             variant="ghost"

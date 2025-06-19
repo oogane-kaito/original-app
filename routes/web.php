@@ -43,7 +43,7 @@ Route::get('/dashboard', function () {
 
 Route::get('/edit', function () {
     return Inertia::render('Editor');
-})->middleware(['auth', 'verified'])->name('edit');
+})->middleware(['auth'])->name('edit');
 
 Route::get('/main', function () {
     return Inertia::render('Main');
