@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
-
+use App\Models\BusinessCard;
 class RegisteredUserController extends Controller
 {
     /**
@@ -46,6 +46,21 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+
+        // 空の名刺レコードを作成
+        BusinessCard::create([
+            'user_id' => $user->id,
+            'name' => '', // 初期値
+            'title' => '', // 初期値
+            'bio' => null, // 初期値
+            'email' => null, // 初期値
+            'phone' => null, // 初期値
+            'avatar' => null, // 初期値
+            'background_color' => null, // 初期値
+            'text_color' => null, // 初期値
+            'accent_color' => null, // 初期値
+        ]);
 
         return redirect(RouteServiceProvider::HOME);
     }

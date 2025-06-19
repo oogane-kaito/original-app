@@ -41,6 +41,10 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/edit', function () {
+    return Inertia::render('Editor');
+})->middleware(['auth', 'verified'])->name('edit');
+
 Route::get('/main', function () {
     return Inertia::render('Main');
 })->middleware(['auth', 'verified'])->name('Main');
