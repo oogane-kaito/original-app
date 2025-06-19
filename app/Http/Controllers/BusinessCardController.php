@@ -33,6 +33,7 @@ class BusinessCardController extends Controller
             'background_color' => 'nullable|string|max:7', // 例: '#ffffff'
             'text_color' => 'nullable|string|max:7',
             'accent_color' => 'nullable|string|max:7',
+             'theme' => 'required|string', // バリデーションを追加
         ]);
 
         $businessCard = BusinessCard::create([
@@ -46,6 +47,7 @@ class BusinessCardController extends Controller
             'background_color' => $request->background_color,
             'text_color' => $request->text_color,
             'accent_color' => $request->accent_color,
+            'theme' => $request->theme,
         ]);
 
         return response()->json($businessCard, 201);
@@ -69,6 +71,7 @@ class BusinessCardController extends Controller
         'background_color' => 'nullable|string|max:7',
         'text_color' => 'nullable|string|max:7',
         'accent_color' => 'nullable|string|max:7',
+        'theme' => 'required|string', // バリデーションを追加
         // リンクのバリデーション
         'links' => 'nullable|array',
         'links.*.id' => 'required|exists:links,id', // リンクIDが必要
@@ -79,7 +82,7 @@ class BusinessCardController extends Controller
     ]);
 
     $businessCard = BusinessCard::findOrFail($id);
-    $businessCard->update($request->only(['name', 'title', 'bio', 'email', 'phone', 'avatar', 'background_color', 'text_color', 'accent_color']));
+    $businessCard->update($request->only(['name', 'title', 'bio', 'email', 'phone', 'avatar', 'background_color', 'text_color', 'accent_color','theme']));
 
     // リンクの更新処理
     if ($request->has('links')) {

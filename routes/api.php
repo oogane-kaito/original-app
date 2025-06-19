@@ -20,7 +20,7 @@ use App\Http\Controllers\ExchangeController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
+Route::post('/sanctum/token', \App\Http\Controllers\PostSanctumTokenController::class);
 
 Route::middleware('auth:sanctum')->group(function () {
     // Business Cards

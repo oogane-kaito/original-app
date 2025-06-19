@@ -11,7 +11,7 @@ class BusinessCard extends Model
 
     protected $fillable = [
         'user_id', 'name', 'title', 'bio', 'email', 'phone', 'avatar',
-        'background_color', 'text_color', 'accent_color',
+        'background_color', 'text_color', 'accent_color','theme'
     ];
 
     // ユーザーとのリレーション

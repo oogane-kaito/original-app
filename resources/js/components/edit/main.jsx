@@ -19,14 +19,14 @@ export default function EditorPage() {
     title: "",
     bio: "",
     avatar: "/placeholder.svg?height=120&width=120",
-    theme: "nature",
-    backgroundColor: "#f0fdf4",
-    textColor: "#1f2937",
-    accentColor: "#22c55e",
+    theme: "nature", // 初期値が設定されています
+    backgroundColor: "#f0fdf4", // 初期値
+    textColor: "#1f2937", // 初期値
+    accentColor: "#22c55e", // 初期値
     phone: "",
     email: "",
     links: [],
-  });
+});
 
   const [activeTab, setActiveTab] = useState("basic");
 
@@ -43,6 +43,7 @@ export default function EditorPage() {
     axios.get("/api/business-cards")
       .then(response => {
         setCardData(response.data.businessCard); // APIからの名刺データを設定
+        updateTheme(response.data.businessCard.theme);
       })
       .catch(error => {
         console.error("エラー:", error);
@@ -68,10 +69,13 @@ export default function EditorPage() {
       })),
     };
 
+    console.log("送信するデータ:", cardDataToSend); // ここでデータを確認
+
     // 名刺データを更新するAPIリクエスト
     axios.put(`/api/business-cards/${cardData.id}`, cardDataToSend)
       .then(() => {
         console.log("名刺が更新されました");
+        console.log("送信したデータ:", cardDataToSend); // ここでデータを確認
       })
       .catch(error => {
         console.error("エラー:", error);
@@ -93,12 +97,18 @@ export default function EditorPage() {
 
   const removeLink = (linkId) => {
     setCardData((prev) => ({
-      ...prev,
-      links: prev.links.map((link) =>
-        link.id === linkId ? { ...link, delete: true } : link // 削除フラグを立てる
-      ),
+        ...prev,
+        links: prev.links.map((link) =>
+            link.id === linkId ? { ...link, delete: true } : link // 削除フラグを立てる
+        ),
     }));
-  };
+
+    // フラグが立っているリンクを除外して表示を更新
+    setCardData((prev) => ({
+        ...prev,
+        links: prev.links.filter((link) => !link.delete) // フラグが立っていないリンクのみを残す
+    }));
+};
 
   const updateTheme = (themeId) => {
     const theme = themes.find((t) => t.id === themeId);
@@ -109,6 +119,8 @@ export default function EditorPage() {
         backgroundColor: theme.bg,
         accentColor: theme.accent,
       }));
+
+      console.log(cardData);
     }
   };
 
@@ -130,6 +142,9 @@ export default function EditorPage() {
                 <span className="text-lg font-bold text-gray-800">名刺エディター(デモ)</span>
               </div>
             </div>
+             <Button onClick={saveCard} size="lg" variant="solid">
+                        保存
+             </Button>
           </div>
         </div>
       </header>

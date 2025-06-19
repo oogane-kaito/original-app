@@ -60,6 +60,7 @@ class RegisteredUserController extends Controller
             'background_color' => null, // 初期値
             'text_color' => null, // 初期値
             'accent_color' => null, // 初期値
+            'theme' => "nature",
         ]);
 
         return redirect(RouteServiceProvider::HOME);
