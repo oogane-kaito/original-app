@@ -10,7 +10,7 @@ class Link extends Model
     use HasFactory;
 
     protected $fillable = [
-        'business_card_id', 'title', 'url', 'icon',
+        'business_card_id', 'title', 'url', 'icon',"delete"
     ];
 
     // 名刺とのリレーション

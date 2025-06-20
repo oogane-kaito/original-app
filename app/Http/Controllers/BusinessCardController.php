@@ -11,16 +11,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 // //指定されたIdのリンクがあるのか判定する関数
-// function linkExists($id) {
-//     try {
-//         // リンクを取得し、存在すれば true を返す
-//         Link::findOrFail($id);
-//         return true;
-//     } catch (ModelNotFoundException $e) {
-//         // リンクが存在しない場合は false を返す
-//         return false;
-//     }
-// }
+function linkExists($id) {
+    try {
+
+        // リンクを取得し、存在すれば true を返す
+        Link::findOrFail($id);
+        dd($link);
+
+        return true;
+    } catch (ModelNotFoundException $e) {
+        // リンクが存在しない場合は false を返す
+
+        return false;
+    }
+}
 
 class BusinessCardController extends Controller
 {
@@ -95,23 +99,40 @@ class BusinessCardController extends Controller
     ]);
 
     $businessCard = BusinessCard::findOrFail($id);
-    $businessCard->update($request->only(['name', 'title', 'bio', 'email', 'phone', 'avatar', 'background_color', 'text_color', 'accent_color', 'theme','visibility']));
+    $businessCard->update($request->only(['name',
+     'title', 
+     'bio', 
+     'email', 
+     'phone', 
+     'avatar', 
+     'background_color', 
+     'text_color', 
+     'accent_color', 
+     'theme',
+     'visibility'
+    ])
+    );
 
     // リンクの更新処理
     if ($request->has('links')) {
         foreach ($request->links as $linkData) {
             if (isset($linkData['delete']) && $linkData['delete']) {
+
                 // リンクが削除される場合
                 $link = Link::findOrFail($linkData['id']);
                 $link->delete();
+               
             } else {
                 // if (linkExists($linkData['id'])) {
                 //     // リンクが更新される場合
+
+                //     dd($link);
                 //     $link = Link::findOrFail($linkData['id']);
                 //     $link->update([
                 //         'title' => $linkData['title'],
                 //         'url' => $linkData['url'],
                 //         'icon' => $linkData['icon'] ?? null, // アイコンはオプション
+                //         'delete' => $linkData['delete'] 
                 //     ]);
                 // } else {
                     // 新しいリンクが追加される場合
@@ -120,7 +141,9 @@ class BusinessCardController extends Controller
                         'title' => $linkData['title'],
                         'url' => $linkData['url'],
                         'icon' => $linkData['icon'] ?? null, // アイコンはオプション
+                        'delete' => $linkData['delete'] ?? false, 
                     ]);
+                // }
                 
             }
         }
