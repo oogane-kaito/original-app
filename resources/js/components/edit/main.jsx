@@ -26,6 +26,7 @@ export default function EditorPage() {
     phone: "",
     email: "",
     links: [],
+    visibility: false
 });
 
   const [activeTab, setActiveTab] = useState("basic");
@@ -43,6 +44,7 @@ export default function EditorPage() {
     axios.get("/api/business-cards")
       .then(response => {
         setCardData(response.data.businessCard); // APIからの名刺データを設定
+        console.log("APIレスポンス:", response.data); 
         updateTheme(response.data.businessCard.theme);
       })
       .catch(error => {
@@ -55,6 +57,7 @@ export default function EditorPage() {
       ...prev,
       links: prev.links.map((link) => (link.id === id ? { ...link, [field]: value } : link)),
     }));
+    console.log(cardData)
   };
 
   const saveCard = () => {
@@ -76,9 +79,11 @@ export default function EditorPage() {
       .then(() => {
         console.log("名刺が更新されました");
         console.log("送信したデータ:", cardDataToSend); // ここでデータを確認
+        alert("保存しました")
       })
       .catch(error => {
         console.error("エラー:", error);
+        alert("保存失敗ごめんね")
       });
   };
 
@@ -104,10 +109,10 @@ export default function EditorPage() {
     }));
 
     // フラグが立っているリンクを除外して表示を更新
-    setCardData((prev) => ({
-        ...prev,
-        links: prev.links.filter((link) => !link.delete) // フラグが立っていないリンクのみを残す
-    }));
+    // setCardData((prev) => ({
+    //     ...prev,
+    //     links: prev.links.filter((link) => !link.delete) 
+    // }));
 };
 
   const updateTheme = (themeId) => {
@@ -123,6 +128,38 @@ export default function EditorPage() {
       console.log(cardData);
     }
   };
+
+  const DeployButton = () => {
+    setCardData((prev) => ({
+        ...prev,
+        visibility:!prev.visibility
+      }));
+    const cardDataToSend = {
+      ...cardData,
+      links: cardData.links.map(link => ({
+        id: link.id,
+        title: link.title,
+        url: link.url,
+        icon: link.icon,
+        delete: link.delete || false,
+      })),
+    };
+    //checkを反転する
+
+    // 名刺データを更新するAPIリクエスト
+    axios.put(`/api/business-cards/${cardData.id}`, cardDataToSend)
+      .then(() => {
+        console.log("公開されました");
+        console.log("送信したデータ:", cardDataToSend); 
+        alert("公開しました")
+      })
+      .catch(error => {
+        console.error("エラー:", error);
+        alert("公開失敗ごめんね(´;ω;｀)")
+      });
+  }
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-green-50 to-white">
@@ -142,9 +179,17 @@ export default function EditorPage() {
                 <span className="text-lg font-bold text-gray-800">名刺エディター(デモ)</span>
               </div>
             </div>
-             <Button onClick={saveCard} size="lg" variant="solid">
+            <div>
+              <Button onClick={saveCard} size="lg" variant="solid">
                         保存
-             </Button>
+              </Button>
+
+              <Button onClick={DeployButton} size="lg" variant="solid">
+                          公開
+              </Button>
+
+            </div>
+             
           </div>
         </div>
       </header>
@@ -288,7 +333,9 @@ export default function EditorPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {cardData.links.map((link) => (
+                    {cardData.links.
+                    filter((link) => !link.delete).
+                    map((link) => (
                       <div
                         key={link.id}
                         className="p-4 border rounded-2xl space-y-3 bg-gradient-to-r from-orange-50 to-green-50"
@@ -310,7 +357,7 @@ export default function EditorPage() {
                         </div>
                         <div className="space-y-2">
                           <Input
-                            value={link.title}
+                            value={link.icon !== "website" ? link.icon : link.title}
                             onChange={(e) => updateLink(link.id, "title", e.target.value)}
                             placeholder={"URLの名前を付けてください"}
                             className={link.icon !== "website" ? "hidden" : "rounded-xl"}
@@ -322,7 +369,11 @@ export default function EditorPage() {
                             className="rounded-xl"
                             type={link.icon === "mail" ? "email" : "url"}
                           />
-                          <Select value={link.icon} onValueChange={(value) => updateLink(link.id, "icon", value)}>
+                          <Select value={link.icon} onValueChange={(value) => {
+                            updateLink(link.id, "icon", value)
+                            updateLink(link.id, "title", value)}
+                            
+                          }>
                             <SelectTrigger>
                               <SelectValue placeholder="追加するURLの種類を選択" />
                             </SelectTrigger>

@@ -10,6 +10,18 @@ use App\Models\Link;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+// //指定されたIdのリンクがあるのか判定する関数
+// function linkExists($id) {
+//     try {
+//         // リンクを取得し、存在すれば true を返す
+//         Link::findOrFail($id);
+//         return true;
+//     } catch (ModelNotFoundException $e) {
+//         // リンクが存在しない場合は false を返す
+//         return false;
+//     }
+// }
+
 class BusinessCardController extends Controller
 {
     public function index()
@@ -59,8 +71,10 @@ class BusinessCardController extends Controller
         return response()->json($businessCard);
     }
 
+
+
     public function update(Request $request, $id)
-    {
+{
     $request->validate([
         'name' => 'nullable|string|max:255',
         'title' => 'nullable|string|max:255',
@@ -71,18 +85,17 @@ class BusinessCardController extends Controller
         'background_color' => 'nullable|string|max:7',
         'text_color' => 'nullable|string|max:7',
         'accent_color' => 'nullable|string|max:7',
-        'theme' => 'required|string', // バリデーションを追加
-        // リンクのバリデーション
+        'theme' => 'required|string', // バリデーションルール
         'links' => 'nullable|array',
-        'links.*.id' => 'required|exists:links,id', // リンクIDが必要
+        'links.*.id' => 'nullable',// 既存のリンクIDが必要
         'links.*.title' => 'required|string|max:255',
         'links.*.url' => 'required|url|max:255',
         'links.*.icon' => 'nullable|string|max:255',
-        'links.*.delete' => 'nullable|boolean', // 削除フラグ
+        'links.*.delete' => 'nullable|boolean',
     ]);
 
     $businessCard = BusinessCard::findOrFail($id);
-    $businessCard->update($request->only(['name', 'title', 'bio', 'email', 'phone', 'avatar', 'background_color', 'text_color', 'accent_color','theme']));
+    $businessCard->update($request->only(['name', 'title', 'bio', 'email', 'phone', 'avatar', 'background_color', 'text_color', 'accent_color', 'theme','visibility']));
 
     // リンクの更新処理
     if ($request->has('links')) {
@@ -92,19 +105,31 @@ class BusinessCardController extends Controller
                 $link = Link::findOrFail($linkData['id']);
                 $link->delete();
             } else {
-                // リンクを更新
-                $link = Link::findOrFail($linkData['id']);
-                $link->update([
-                    'title' => $linkData['title'],
-                    'url' => $linkData['url'],
-                    'icon' => $linkData['icon'] ?? null, // アイコンはオプション
-                ]);
+                // if (linkExists($linkData['id'])) {
+                //     // リンクが更新される場合
+                //     $link = Link::findOrFail($linkData['id']);
+                //     $link->update([
+                //         'title' => $linkData['title'],
+                //         'url' => $linkData['url'],
+                //         'icon' => $linkData['icon'] ?? null, // アイコンはオプション
+                //     ]);
+                // } else {
+                    // 新しいリンクが追加される場合
+                    Link::create([
+                        'business_card_id' => $businessCard->id, // ビジネスカードとのリレーション
+                        'title' => $linkData['title'],
+                        'url' => $linkData['url'],
+                        'icon' => $linkData['icon'] ?? null, // アイコンはオプション
+                    ]);
+                
             }
         }
     }
 
     return response()->json($businessCard);
-    }
+}
+
+    
 
     public function destroy($id)
     {

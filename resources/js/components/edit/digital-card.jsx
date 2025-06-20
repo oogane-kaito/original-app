@@ -95,7 +95,9 @@ export function DigitalCard({ data }) {
 
           {/* Links */}
           <div className="space-y-3">
-            {data.links.map((link) => {
+            {data.links.
+            filter((link) => !link.delete).
+            map((link) => {
               const IconComponent = getIcon(link.icon);
               return (
                 <Button
